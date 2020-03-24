@@ -4,8 +4,30 @@ use std::iter::repeat;
 
 const TEN_RADIX: u32 = 10;
 
+#[derive(Debug)]
+enum Bit {
+    One,
+    Zero
+}
+
+impl Bit {
+    fn from(src: u32) -> Self {
+        match src {
+            0 => Bit::Zero,
+            1 => Bit::One,
+            _ => unimplemented!()
+        }
+    }
+    fn to_u32(&self) -> u32 {
+        match self {
+            Bit::Zero => 0,
+            Bit::One => 1
+        }
+    }
+}
+
 struct MD5Input {
-    bytes: Vec<Vec<u32>>,
+    bytes: Vec<Vec<Bit>>,
 }
 
 impl MD5Input {
@@ -17,8 +39,8 @@ impl MD5Input {
                     format!("{:b}", b)
                         .chars()
                         .into_iter()
-                        .map(|c| c.to_digit(TEN_RADIX).unwrap())
-                        .collect::<Vec<u32>>()
+                        .map(|c| Bit::from(c.to_digit(TEN_RADIX).unwrap()))
+                        .collect::<Vec<Bit>>()
                 })
                 .collect(),
         }
@@ -55,7 +77,7 @@ mod tests {
             .into_iter()
             .map(|v| {
                 v.iter()
-                    .fold("".to_string(), |init, c| init + format!("{}", c).as_ref())
+                    .fold("".to_string(), |init, c| init + format!("{}", c.to_u32()).as_ref())
             })
             .collect();
 
