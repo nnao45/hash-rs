@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/md5-rs.iml" filepath="$PROJECT_DIR$/md5-rs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hash-rs.iml" filepath="$PROJECT_DIR$/hash-rs.iml" />
     </modules>
   </component>
 </project>

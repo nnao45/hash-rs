@@ -1,86 +1,50 @@
-use bitvec::prelude::*;
+use std::borrow::Borrow;
 
-use std::iter::repeat;
+const S11: u32 = 7;
+const S12: u32 = 12;
+const S13: u32 = 17;
+const S14: u32 = 22;
+const S21: u32 = 5;
+const S22: u32 = 9;
+const S23: u32 = 14;
+const S24: u32 = 20;
+const S31: u32 = 4;
+const S32: u32 = 11;
+const S33: u32 = 16;
+const S34: u32 = 23;
+const S41: u32 = 6;
+const S42: u32 = 10;
+const S43: u32 = 15;
+const S44: u32 = 21;
 
-const TEN_RADIX: u32 = 10;
+const PADDING:[u8; 64] = [0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-#[derive(Debug)]
-enum Bit {
-    One,
-    Zero
+fn f(x: u8, y: u8, z: u8) -> u8 {
+    x & y | !x & z
 }
 
-impl Bit {
-    fn from(src: u32) -> Self {
-        match src {
-            0 => Bit::Zero,
-            1 => Bit::One,
-            _ => unimplemented!()
-        }
-    }
-    fn to_u32(&self) -> u32 {
-        match self {
-            Bit::Zero => 0,
-            Bit::One => 1
-        }
-    }
+fn g(x: u8, y: u8, z: u8) -> u8 {
+    x & z | y & !z
 }
 
-struct MD5Input {
-    bytes: Vec<Vec<Bit>>,
+fn h(x: u8, y: u8, z: u8) -> u8 {
+    x ^ z | y ^ z
 }
 
-impl MD5Input {
-    fn new(bv: &[u8]) -> Self {
-        MD5Input {
-            bytes: bv
-                .iter()
-                .map(|b| {
-                    format!("{:b}", b)
-                        .chars()
-                        .into_iter()
-                        .map(|c| Bit::from(c.to_digit(TEN_RADIX).unwrap()))
-                        .collect::<Vec<Bit>>()
-                })
-                .collect(),
-        }
-    }
+fn i(x: u8, y: u8, z: u8) -> u8 {
+    y ^ x | x ^ !z
+}
+
+fn rotate_left(x: u8, n: u8) -> u8 {
+    x << n | x >> (32 - n)
+}
+
+fn double_order(a: u8, b: u8, c: u8, d: u8, x: u8, s: u8, ac: u8, op: Box<dyn Fn(u8, u8, u8) -> u8>) -> u8 {
+    rotate_left(op.borrow(b, c, d) + x + ac, s) + b
 }
 
 fn main() {
-    let mut bv = bitvec![Msb0, u8; 0, 1, 0, 1];;
-    println!("{}", bv);
-    let bit_arr: Vec<u32> = format!("{:b}", 123)
-        .chars()
-        .into_iter()
-        .map(|c| c.to_digit(TEN_RADIX).unwrap())
-        .collect();
-    "abc".as_bytes().iter().for_each(|c| println!("{:b}", c));
-    let bit_arr2 = MD5Input::new("abc".as_bytes());
-    println!("{:?}", bit_arr2.bytes);
-}
 
-#[cfg(test)]
-mod tests {
-    use crate::MD5Input;
-
-    #[test]
-    fn test_md5_input() {
-        let b = "abc".as_bytes();
-        let expect: Vec<String> = b
-            .iter()
-            .map(|c| format!("{:b}", c))
-            .collect();
-        let input = MD5Input::new(b);
-        let actual: Vec<String> = input
-            .bytes
-            .into_iter()
-            .map(|v| {
-                v.iter()
-                    .fold("".to_string(), |init, c| init + format!("{}", c.to_u32()).as_ref())
-            })
-            .collect();
-
-        assert_eq!(expect, actual)
-    }
 }
