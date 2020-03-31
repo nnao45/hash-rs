@@ -49,6 +49,7 @@ impl Debug for MD5Context {
 impl MD5Context {
     fn init() -> Self {
         let mut init = [0u32; 64];
+        // Tn = [ 2^32 * |sin n| ] (n = 1,2,3...,64)
         let temp_buf: Vec<u32> = (1..65).collect::<Vec<u32>>().iter().map(|c|(((*c as f64).sin()) * (std::u32::MAX as f64)) as u32).collect();
         for (i, b) in temp_buf.into_iter().enumerate() {
             init[i] = b
